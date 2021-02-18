@@ -1,24 +1,12 @@
-# vuetest
+(Somewhat) working demo:
+Represents as "calendar creator"
+http://secure-springs-78332.herokuapp.com/?cid=NCKAA8&test=test
+Represents app as you are visitor.
+http://secure-springs-78332.herokuapp.com/?cid=NCKAA8&test=test1
 
-## Project setup
-```
-npm install
-```
+Visitor can have one (1) reservation.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+cid = Calendar code which is unique.
+test = test-username
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+Backend only takes requests from above url due by the CORS-rule.
