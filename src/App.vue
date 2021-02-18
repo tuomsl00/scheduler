@@ -14,6 +14,15 @@
           ref="calendar"
           >
         </v-date-picker>
+    <p v-if="activeDate && calendarMode=='reserve'">
+        <a v-on:click="selectMonth(activeDate)">Active date {{activeDate.year}}-{{activeDate.month}}-{{activeDate.day}}</a>
+    </p>
+        <p v-if="reserved">You have reservation at<br />
+            <md-button v-on:click="selectMonth(reserved)" class="md-primary">
+            {{reservedDate}}
+            </md-button>
+        </p>
+
     <md-list v-if="calendarMode=='reserve'">
             <md-list-item
               is="ReserveItem"
@@ -87,7 +96,6 @@ export default {
   created() {
     const params = new URLSearchParams(window.location.search)
     for (const param of params) {
-        console.log(param)
         if (param[0] == "cid") this.calendarCode = param[1];
         if (param[0] == "test") {
             this.username = param[1];
@@ -157,7 +165,7 @@ export default {
     toggleActButton() {
       this.actLogin = !this.actLogin;
   },
-  // Populate dates from specific day that'll be listed on front.
+  // Populate reservable positions from specific day that'll be listed on front.
   daySelect(day) {
       this.dateSelected = true;
       if (!this.date) this.dateSelected = false;
@@ -196,7 +204,6 @@ export default {
   newmonth() {
       const year = this.$refs.calendar.$refs.calendar.pages[0].year;
       const month = this.$refs.calendar.$refs.calendar.pages[0].month;
-      console.log(year);
       this.monthpage = year+"-"+month;
       let i = 0;
       for (i = 0; i < this.dateCache.length; i++) {
@@ -206,31 +213,6 @@ export default {
       }
       if (i == this.dateCache.length) this.fetchData();
       
-  },
-
-  async testdata() {            
-      /*
-      await axios.post('http://localhost:8080/app/test', '', this.config)
-      .then(response => {
-          console.log(response.data);
-      }).catch(err => {
-           console.log(err);     
-      })
-      */
-      
-      await axios.get(this.APIHost+'/app/calendars', this.config)
-      .then(response => {
-          console.log(response.data);
-      }).catch(err => {
-           console.log(err);     
-      })
-      
-  },
-  toggleMode() {
-      this.disabledDates = '';
-//            this.calendarMode='reservable';
-//            this.CalendarOwner();
-      console.log(this.daytimes);
   },
   resetDates() {
     this.reserved = null;
@@ -242,19 +224,12 @@ export default {
   removeReservableDates(index, dayId) {
       this.reservableTimes.splice(index, 1);
       this.daytimes[dayId].splice(index, 1);
-//            console.log(index+" "+this.daytimes[dayId][index]);
-      /*
-      this.reservableData.printed.splice(index, 1);
-      this.reservableData.dates.splice(index, 1)
-      */
   },
   copyToDay() {
       const times = new Date(this.date);
       const year = times.getFullYear();
       const month = times.getMonth()+1;
-      const theDay = times.getDate();
-      console.log(this.date);
-      
+      const theDay = times.getDate();      
       const theDayid = year+"-"+month+"-"+theDay;
 
       for (let day = theDay-7; day > 0; day-=7) {
@@ -446,25 +421,22 @@ export default {
       
       await axios.post(this.APIHost+'/app/Login', '', this.loginConfig)
       .then(response => {
-          console.log(response.data);
           this.config.headers.access_token = response.data.access_token;
           let jwt = response.data.access_token.split('.');
-          console.log(jwt[0]);
-          
+
+        // TODO: use cookie. (undone)
           document.cookie = "jwt="+jwt[0];
           document.cookie = "jwt="+jwt[1];
           document.cookie = "jwt="+jwt[2];
           
-          console.log(document.cookie);
           this.loggedIn = true;
       }).catch(err => {
-           console.log(err);     
+           alert(err);     
       })
       
   },
   async fetchData() {
       const times = new Date(this.monthpage);
-      console.log(this.monthpage);
       const year = times.getFullYear();
       const month = times.getMonth()+1;
       const monthData = { "year": year, "month": month };
@@ -474,7 +446,6 @@ export default {
           let days = [];
           let dayid = null;
           let id = 0;
-
           if (!this.calendarMode) this.setSuitableCalendarMode();
           for(let data of response.data) {
 
@@ -488,7 +459,6 @@ export default {
               const hour = (data.hour > 9 ? "" + data.hour: "0" + data.hour);
               const minute = (data.minute > 9 ? "" + data.minute: "0" + data.minute);
 
-          //    console.log(this.daytimes[dayid][ thi.id);
               this.daytimes[dayid].push({
                   id: this.daytimes[dayid].length,
                   dayId: dayid,
@@ -512,7 +482,7 @@ export default {
               dates: []
           });
           }).catch(err => {
-               console.log(err);     
+               alert(err);     
           })
 
   },
@@ -547,13 +517,12 @@ export default {
       await axios.get(this.APIHost+'/app/reservations-by-calendar/'+this.calendarCode)
       .then(response => {
           for(let data of response.data.reservations) {
-                console.log(this.you+" "+data.userid);
               if (this.you == data.userid) {
                 this.setReservedData(data);
               }
           }
       }).catch(err => {
-          console.log(err);     
+          alert(err);     
       });
   },
   setReservedData(data) {
@@ -583,14 +552,8 @@ export default {
             if (typeof time.timeData !== 'undefined') {
                 const c = reservableData.dates.length+countOld;
                 const i = (c==-1)?0:c;
-                /*
-                console.log(this.$refs.res[i].$refs);
-                const [hours, minutes] = this.$refs.res[i].$refs.at.value.split(':');
-                time.timeData.hour = hours;//this.$refs.res[i].$refs.at.value.getHours();
-                time.timeData.minute = minutes; //this.$refs.res[i].$refs.at.value.getMinutes();
-                */
+
                 reservableData.dates.push(time.timeData);
-                console.log(this.$refs+" "+i);
                 reservableData.dates[
                     reservableData.dates.length-1
                 ].durationInMinutes = this.$refs.res[i].$refs.durMin.value;
@@ -602,12 +565,6 @@ export default {
             }
         }
     }
-    /*
-    for (let day in this.daytimes) {
-        //    this.reservableData.dates.push(time.timeData);
-    }
-    */
-    console.log(removeThese);
 
     if (removeThese.length) {
         await axios.delete(this.APIHost+'/app/reservables/'+this.calendarCode, {headers: this.config.headers, data: {reservableId: removeThese}})
@@ -617,25 +574,29 @@ export default {
             for (let reservable of this.daytimes[day]) {
                 for (let remove of removeThese) {
                     if (reservable.reservableId == remove) this.daytimes[day].splice(i, 1);
-                    console.log(reservable.reservableId+" "+remove);
                 }
                 i++;
             }
+        }).catch(err => {
+            alert(err);     
         });
       }
       
-  //    console.log(this.reservableData.dates);
       if (reservableData.dates.length) {
           await axios.post(this.APIHost+'/app/reservable', reservableData, this.config)
           .then(response => {
               console.log(response);
-          });
+          }).catch(err => {
+            alert(err);     
+        });
       }
       if (reservablePatch.length) {
           await axios.patch(this.APIHost+'/app/reservable', reservablePatch, this.config)
           .then(response => {
               console.log(response);
-          });
+          }).catch(err => {
+        alert(err);     
+   });
       }
       
   //   remove 'unconfirmed activity' -mark
@@ -644,29 +605,35 @@ export default {
       this.attrs = this.days;
       this.saving = false;
   },
-  async sendReserveData(reservableId) {
-      await axios.post(this.APIHost+'/app/reserve', [{"code": this.calendarCode, "reservableId": reservableId}], this.config)
-      .then(response => {
-          this.resetDates();
-          this.fetchData();
-          this.checkReservations();
-          console.log(this.reserved); 
-      });
+    async sendReserveData(reservableId) {
+    await axios.post(this.APIHost+'/app/reserve', [{"code": this.calendarCode, "reservableId": reservableId}], this.config)
+        .then(async(response) => {
+            this.resetDates();
+            await this.fetchData();
+            await this.checkReservations();
+            this.selectMonth(this.activeDate);
+      }).catch(err => {
+        alert(err);     
+   });
   },
   async deleteReservation(reservationId) {
-      console.log(this.reserved);
       await axios.delete(this.APIHost+'/app/reservation/'+reservationId, {headers: this.config.headers})
-      .then(response => {
+      .then(async(response) => {
           this.resetDates();
-          this.fetchData();
-          this.checkReservations(); 
-      });
+          await this.fetchData();
+          await this.checkReservations();
+          this.selectMonth(this.activeDate); 
+      }).catch(err => {
+        alert(err);     
+   });
   },
   async newUser(reservableId) {
       await axios.post(this.APIHost+'/app/user', {"username": this.username, "password": this.password})
       .then(response => {
           console.log(response);
-      });
+      }).catch(err => {
+        alert(err);     
+   });
   },
   async getCalendar() {
     await axios.get(this.APIHost+'/app/calendar/'+this.calendarCode)
