@@ -5,6 +5,7 @@ http://secure-springs-78332.herokuapp.com/?cid=NCKAA8&test=test
 
 Represents app as you are visitor.
 http://secure-springs-78332.herokuapp.com/?cid=NCKAA8&test=test1
+Break it! :)
 
 Visitor can have one (1) reservation.
 
