@@ -482,7 +482,7 @@ export default {
               dates: []
           });
           }).catch(err => {
-               alert(err);     
+               console.log(err);     
           })
 
   },
@@ -583,6 +583,7 @@ export default {
       }
       
       if (reservableData.dates.length) {
+          console.log(reservableData);
           await axios.post(this.APIHost+'/app/reservable', reservableData, this.config)
           .then(response => {
               console.log(response);
@@ -596,8 +597,12 @@ export default {
               console.log(response);
           }).catch(err => {
         alert(err);     
-   });
+        });
       }
+    
+        this.resetDates();
+        await this.fetchData();
+        this.selectMonth(this.activeDate);
       
   //   remove 'unconfirmed activity' -mark
       const idx = this.days[1].dates.map(Number).indexOf(+this.date);
