@@ -6,8 +6,8 @@
                   <v-date-picker v-model="date" mode="time" ref="at" is24hr v-on:input="$emit('changetime', time, date)">
                       <template v-slot="{ inputEvents }">
                       <md-field>
-                        <md-input type="text" :value="time.time" v-on="inputEvents" v-if="!time.remove"></md-input>
-                        <md-input type="text" :value="time.time" v-on="inputEvents" v-if="time.remove" disabled></md-input>
+                        <md-input type="time" :value="time.time" v-on="inputEvents" v-if="!time.remove"></md-input>
+                        <md-input type="time" :value="time.time" v-on="inputEvents" v-if="time.remove" disabled></md-input>
                       </md-field>
   
                       </template>
@@ -17,13 +17,13 @@
 
         <md-table-cell>
             <md-field>
-              <md-input maxlength="2" size="2" ref="pos" v-on:input="$emit('changepos')" :value="time.entries" v-if="!time.remove"></md-input>        
+              <md-input maxlength="2" size="2" ref="pos" v-on:input="$emit('changepos')" :value="time.entries" v-if="!time.remove" type="number" min="1" max="99"></md-input>        
               <md-input maxlength="2" size="2" ref="pos" v-on:input="$emit('changepos')" :value="time.entries" v-if="time.remove" disabled></md-input>
             </md-field>        
         </md-table-cell>
         <md-table-cell>
             <md-field>
-                <md-input ref="durMin" v-on:input="$emit('changedur')" :value="time.durationInMinutes" v-if="!time.remove"></md-input>
+                <md-input ref="durMin" v-on:input="$emit('changedur')" :value="time.durationInMinutes" v-if="!time.remove" type="number"></md-input>
                 <md-input ref="durMin" v-on:input="$emit('changedur')" :value="time.durationInMinutes" v-if="time.remove" disabled></md-input>
             </md-field>
         </md-table-cell>
