@@ -2,7 +2,7 @@ Demo:
 
 Represents as "calendar creator"
 http://secure-springs-78332.herokuapp.com/?cid=NCKAA8&test=test
-(There might be slight loadtime as data will be loaded via rest-api. There should be at least one marked date per month.)
+(It may take a while (even 15 sec.) to load the dates via rest-api. Servers might be in resting mode.)
 
 Represents app as you are visitor.
 http://secure-springs-78332.herokuapp.com/?cid=NCKAA8&test=test1
