@@ -15,8 +15,6 @@ test = test-username
 Backend only takes requests from above url due by the CORS-rule.
 
 
-Break it! :)
-
 ## Project setup
 ```
 npm install
